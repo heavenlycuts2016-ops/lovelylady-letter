@@ -457,16 +457,12 @@
 
     function getVoice() {
       const voices = window.speechSynthesis.getVoices();
-      // Same voice used in the mom-forever letter
-      return voices.find(v =>
-        v.name.toLowerCase().includes('female') ||
-        v.name.toLowerCase().includes('samantha') ||
-        v.name.toLowerCase().includes('karen') ||
-        v.name.toLowerCase().includes('victoria') ||
-        v.name.toLowerCase().includes('zira')
-      ) || voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
-        voices.find(v => v.lang && v.lang.startsWith('en')) ||
-        voices[0] || null;
+      const preferred = ['Samantha', 'Karen', 'Victoria', 'Susan', 'Zira', 'Google US English'];
+      for (const name of preferred) {
+        const v = voices.find(v => v.name.includes(name));
+        if (v) return v;
+      }
+      return voices.find(v => v.lang && v.lang.startsWith('en')) || voices[0] || null;
     }
 
     function setStatus(t) { document.getElementById('voice-status').textContent = t; }
@@ -500,8 +496,8 @@
         return;
       }
       const u = new SpeechSynthesisUtterance(letterParagraphs[currentIndex]);
-      u.rate = 0.88;   // Same rate as mom-forever letter
-      u.pitch = 1.05;  // Same pitch as mom-forever letter
+      u.rate = 0.88;
+      u.pitch = 1.05;
       u.volume = 1;
       const v = getVoice(); if (v) u.voice = v;
       u.onstart = () => setStatus('Reading…');
