@@ -457,24 +457,16 @@
 
     function getVoice() {
       const voices = window.speechSynthesis.getVoices();
-      // Warm Southern US female — best available across Chrome, Edge, Safari
-      const preferred = [
-        'Microsoft Amber',
-        'Microsoft Ana',
-        'Microsoft Aria Online',
-        'Microsoft Jenny Online',
-        'Google US English',
-        'Samantha',
-        'Susan',
-        'Zira'
-      ];
-      for (const name of preferred) {
-        const v = voices.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
-        if (v) return v;
-      }
-      return voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
-             voices.find(v => v.lang && v.lang.startsWith('en')) ||
-             voices[0] || null;
+      // Same voice used in the mom-forever letter
+      return voices.find(v =>
+        v.name.toLowerCase().includes('female') ||
+        v.name.toLowerCase().includes('samantha') ||
+        v.name.toLowerCase().includes('karen') ||
+        v.name.toLowerCase().includes('victoria') ||
+        v.name.toLowerCase().includes('zira')
+      ) || voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
+        voices.find(v => v.lang && v.lang.startsWith('en')) ||
+        voices[0] || null;
     }
 
     function setStatus(t) { document.getElementById('voice-status').textContent = t; }
@@ -508,8 +500,8 @@
         return;
       }
       const u = new SpeechSynthesisUtterance(letterParagraphs[currentIndex]);
-      u.rate = 0.75;   // Slow, warm, gentle Tennessee pace
-      u.pitch = 1.05;  // Slightly warm and feminine
+      u.rate = 0.88;   // Same rate as mom-forever letter
+      u.pitch = 1.05;  // Same pitch as mom-forever letter
       u.volume = 1;
       const v = getVoice(); if (v) u.voice = v;
       u.onstart = () => setStatus('Reading…');
