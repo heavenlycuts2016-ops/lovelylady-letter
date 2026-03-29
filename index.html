@@ -400,21 +400,43 @@
       }
     }
 
-    // ── Scroll observer: when letter card enters view, fade it in and start reading ──
+    // ── Scroll observer: when letter section enters view, fade card in and auto-start reading ──
     const card = document.getElementById('letter-card');
+
+    // Browsers block speechSynthesis until a user gesture has occurred.
+    // We use the scroll event itself as the gesture trigger.
+    let scrollGestureUsed = false;
+
+    function tryStartReading() {
+      if (readingStarted) return;
+      readingStarted = true;
+      card.classList.add('visible');
+      // Small delay so the fade-in is visible before voice starts
+      setTimeout(() => {
+        // Kick speechSynthesis with a silent utterance first to unlock it on some browsers
+        const unlock = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(unlock);
+        setTimeout(() => { startReading(); }, 400);
+      }, 1200);
+    }
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          card.classList.add('visible');
-          if (!readingStarted) {
-            readingStarted = true;
-            setTimeout(() => { startReading(); }, 1800);
-          }
+          tryStartReading();
           observer.unobserve(card);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.05 }); // trigger as soon as even 5% of card is visible
     observer.observe(card);
+
+    // Also trigger on any scroll past the hero as a fallback
+    window.addEventListener('scroll', function onScroll() {
+      if (window.scrollY > window.innerHeight * 0.5) {
+        tryStartReading();
+        window.removeEventListener('scroll', onScroll);
+      }
+    }, { passive: true });
 
     const letterParagraphs = [
       "Dear Sister.",
