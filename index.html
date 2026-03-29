@@ -351,8 +351,8 @@
     var ytPlayer;
     function onYouTubeIframeAPIReady() {
       ytPlayer = new YT.Player('yt-player', {
-        videoId: 't7owFiihXgg',
-        playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: 't7owFiihXgg', rel: 0, modestbranding: 1 },
+        videoId: 'OKWkYxikygQ',
+        playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: 'OKWkYxikygQ', rel: 0, modestbranding: 1 },
         events: { 'onReady': function(e) { /* ready, waiting for user click */ } }
       });
     }
@@ -448,9 +448,7 @@
           if (ytPlayer && ytPlayer.playVideo) {
             ytPlayer.setVolume(70);
             ytPlayer.playVideo();
-          }
-          setStatus('\u2665 You Know My Name — Tasha Cobbs');
-        }, 800);
+                    setStatus('\u2665 Playing for you \u2014 with love from Serena');      }, 800);
         return;
       }
       const u = new SpeechSynthesisUtterance(letterParagraphs[currentIndex]);
