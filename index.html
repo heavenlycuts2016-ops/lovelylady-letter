@@ -457,29 +457,21 @@
 
     function getVoice() {
       const voices = window.speechSynthesis.getVoices();
-      // Best warm natural American female voices — audiobook narrator quality
+      // Warm Southern US female — best available across Chrome, Edge, Safari
       const preferred = [
-        'Google US English',          // Chrome — most natural, warm American female
-        'Microsoft Aria Online (Natural)', // Edge neural — top tier natural
-        'Microsoft Aria Online',      // Edge neural warm female
-        'Microsoft Michelle Online (Natural)',
-        'Microsoft Michelle Online',  // Edge neural — soft warm American
-        'Microsoft Jenny Online (Natural)',
-        'Microsoft Jenny Online',     // Edge neural — conversational
-        'Samantha',                   // macOS/iOS — warm, clear American
-        'Google UK English Female',   // Clear and warm fallback
-        'Susan', 'Zira', 'Victoria'
+        'Microsoft Amber',
+        'Microsoft Ana',
+        'Microsoft Aria Online',
+        'Microsoft Jenny Online',
+        'Google US English',
+        'Samantha',
+        'Susan',
+        'Zira'
       ];
       for (const name of preferred) {
         const v = voices.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
         if (v) return v;
       }
-      // Any online neural US English voice
-      const neural = voices.find(v =>
-        v.lang && v.lang.startsWith('en-US') &&
-        (v.name.toLowerCase().includes('online') || v.name.toLowerCase().includes('natural'))
-      );
-      if (neural) return neural;
       return voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
              voices.find(v => v.lang && v.lang.startsWith('en')) ||
              voices[0] || null;
@@ -516,8 +508,8 @@
         return;
       }
       const u = new SpeechSynthesisUtterance(letterParagraphs[currentIndex]);
-      u.rate = 0.78;   // Slower, warm, like an audiobook narrator reading a heartfelt letter
-      u.pitch = 1.0;    // Natural pitch — not artificially high, just warm and real
+      u.rate = 0.75;   // Slow, warm, gentle Tennessee pace
+      u.pitch = 1.05;  // Slightly warm and feminine
       u.volume = 1;
       const v = getVoice(); if (v) u.voice = v;
       u.onstart = () => setStatus('Reading…');
