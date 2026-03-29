@@ -308,10 +308,22 @@
       <div style="font-size:2rem; letter-spacing:0.6rem;">🕊️ ✝️ 🕊️</div>
       <div class="hero-title">A Letter For You</div>
       <div class="hero-sub">From Serena &nbsp;·&nbsp; With Love &amp; Faith</div>
-      <a href="#letter-section" class="scroll-prompt">
-        <span>Scroll to read</span>
-        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-      </a>
+      <button id="open-btn" onclick="openAndRead()" style="
+        margin-top:1.6rem;
+        background: linear-gradient(135deg, #7c3aed, #4c1d95);
+        color: #fff;
+        border: none;
+        border-radius: 50px;
+        padding: 1.2rem 3.2rem;
+        font-size: 1.25rem;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        cursor: pointer;
+        box-shadow: 0 6px 30px rgba(124,58,237,0.6);
+        letter-spacing: 0.04em;
+        transition: transform 0.15s, box-shadow 0.15s;
+      ">&#10013; Open My Letter</button>
+      <div style="margin-top:0.7rem; font-size:0.8rem; color:rgba(255,255,255,0.5); font-style:italic;">Tap once &mdash; your letter will read itself to you</div>
     </div>
   </section>
 
@@ -400,43 +412,21 @@
       }
     }
 
-    // ── Scroll observer: when letter section enters view, fade card in and auto-start reading ──
+    // ── One-tap open: button on hero triggers scroll + immediate read ──
     const card = document.getElementById('letter-card');
 
-    // Browsers block speechSynthesis until a user gesture has occurred.
-    // We use the scroll event itself as the gesture trigger.
-    let scrollGestureUsed = false;
-
-    function tryStartReading() {
+    function openAndRead() {
       if (readingStarted) return;
       readingStarted = true;
+      // Hide the button
+      document.getElementById('open-btn').style.display = 'none';
+      // Scroll smoothly to the letter
+      document.getElementById('letter-section').scrollIntoView({ behavior: 'smooth' });
+      // Fade in the card
       card.classList.add('visible');
-      // Small delay so the fade-in is visible before voice starts
-      setTimeout(() => {
-        // Kick speechSynthesis with a silent utterance first to unlock it on some browsers
-        const unlock = new SpeechSynthesisUtterance('');
-        window.speechSynthesis.speak(unlock);
-        setTimeout(() => { startReading(); }, 400);
-      }, 1200);
+      // Start reading immediately — the button click IS the user gesture browsers require
+      setTimeout(() => { startReading(); }, 900);
     }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          tryStartReading();
-          observer.unobserve(card);
-        }
-      });
-    }, { threshold: 0.05 }); // trigger as soon as even 5% of card is visible
-    observer.observe(card);
-
-    // Also trigger on any scroll past the hero as a fallback
-    window.addEventListener('scroll', function onScroll() {
-      if (window.scrollY > window.innerHeight * 0.5) {
-        tryStartReading();
-        window.removeEventListener('scroll', onScroll);
-      }
-    }, { passive: true });
 
     const letterParagraphs = [
       "Dear Sister.",
