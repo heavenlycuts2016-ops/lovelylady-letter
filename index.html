@@ -435,17 +435,29 @@
 
     function getVoice() {
       const voices = window.speechSynthesis.getVoices();
+      // Best warm natural American female voices — audiobook narrator quality
       const preferred = [
-        'Microsoft Amber', 'Microsoft Ana', 'Microsoft Michelle Online',
-        'Microsoft Jenny Online', 'Microsoft Aria Online',
-        'Google US English', 'Samantha', 'Susan', 'Zira', 'Victoria'
+        'Google US English',          // Chrome — most natural, warm American female
+        'Microsoft Aria Online (Natural)', // Edge neural — top tier natural
+        'Microsoft Aria Online',      // Edge neural warm female
+        'Microsoft Michelle Online (Natural)',
+        'Microsoft Michelle Online',  // Edge neural — soft warm American
+        'Microsoft Jenny Online (Natural)',
+        'Microsoft Jenny Online',     // Edge neural — conversational
+        'Samantha',                   // macOS/iOS — warm, clear American
+        'Google UK English Female',   // Clear and warm fallback
+        'Susan', 'Zira', 'Victoria'
       ];
       for (const name of preferred) {
         const v = voices.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
         if (v) return v;
       }
-      const online = voices.find(v => v.lang && v.lang.startsWith('en-US') && v.name.toLowerCase().includes('online'));
-      if (online) return online;
+      // Any online neural US English voice
+      const neural = voices.find(v =>
+        v.lang && v.lang.startsWith('en-US') &&
+        (v.name.toLowerCase().includes('online') || v.name.toLowerCase().includes('natural'))
+      );
+      if (neural) return neural;
       return voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
              voices.find(v => v.lang && v.lang.startsWith('en')) ||
              voices[0] || null;
@@ -482,8 +494,8 @@
         return;
       }
       const u = new SpeechSynthesisUtterance(letterParagraphs[currentIndex]);
-      u.rate = 0.82;
-      u.pitch = 1.08;
+      u.rate = 0.78;   // Slower, warm, like an audiobook narrator reading a heartfelt letter
+      u.pitch = 1.0;    // Natural pitch — not artificially high, just warm and real
       u.volume = 1;
       const v = getVoice(); if (v) u.voice = v;
       u.onstart = () => setStatus('Reading…');
