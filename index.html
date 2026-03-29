@@ -202,10 +202,96 @@
     @media (max-width: 600px) {
       .letter-card { padding: 2rem 1.4rem; }
     }
+
+    /* ── WELCOME SPLASH ── */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-image: url('bg_crosses_waterfall.jpg');
+      background-size: cover;
+      background-position: center;
+      text-align: center;
+      padding: 2rem;
+    }
+    #splash::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(10, 5, 25, 0.55);
+    }
+    #splash-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4rem;
+    }
+    #splash .splash-icons { font-size: 2.5rem; letter-spacing: 0.6rem; }
+    #splash h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 5vw, 3rem);
+      color: #fff;
+      font-style: italic;
+      text-shadow: 0 2px 16px rgba(0,0,0,0.7);
+    }
+    #splash p {
+      color: rgba(255,255,255,0.8);
+      font-size: 1.05rem;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+      max-width: 420px;
+    }
+    #splash-btn {
+      margin-top: 0.5rem;
+      background: linear-gradient(135deg, #9333ea, #6b21a8);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 1rem 2.8rem;
+      font-size: 1.15rem;
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      cursor: pointer;
+      box-shadow: 0 6px 30px rgba(147,51,234,0.5);
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.03em;
+    }
+    #splash-btn:hover {
+      transform: scale(1.04);
+      box-shadow: 0 8px 36px rgba(147,51,234,0.7);
+    }
+    #splash .splash-note {
+      font-size: 0.82rem;
+      color: rgba(255,255,255,0.45);
+      font-style: italic;
+    }
+
+    /* hidden YouTube player */
+    #yt-player { position: fixed; bottom: -200px; left: -200px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
   </style>
 </head>
 <body>
-  <div id="page">
+
+  <!-- ── WELCOME SPLASH ── -->
+  <div id="splash">
+    <div id="splash-inner">
+      <div class="splash-icons">🕊️ ✝️ 🕊️</div>
+      <h2>A Letter For You</h2>
+      <p>From Serena &mdash; with love, faith, and a grateful heart.</p>
+      <button id="splash-btn" onclick="enterLetter()">✝ Open My Letter</button>
+      <span class="splash-note">Music &amp; reading will begin when you open it</span>
+    </div>
+  </div>
+
+  <!-- Hidden YouTube player for Tasha Cobbs - You Know My Name -->
+  <div id="yt-player"></div>
+
+  <div id="page" style="display:none;">
     <div class="letter-card">
 
       <div class="letter-header">
@@ -249,7 +335,42 @@
     <div class="letter-footer">Guided by Faith &nbsp;·&nbsp; Bound by Grace &nbsp;·&nbsp; 🕊️</div>
   </div>
 
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script>
+    var ytPlayer;
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('yt-player', {
+        videoId: 't7owFiihXgg',
+        playerVars: { autoplay: 0, controls: 0, loop: 1, playlist: 't7owFiihXgg', rel: 0, modestbranding: 1 },
+        events: { 'onReady': function(e) { /* ready, waiting for user click */ } }
+      });
+    }
+
+    function enterLetter() {
+      // Fade out splash
+      const splash = document.getElementById('splash');
+      splash.style.transition = 'opacity 1.2s ease';
+      splash.style.opacity = '0';
+      setTimeout(() => { splash.style.display = 'none'; }, 1200);
+
+      // Show letter
+      const page = document.getElementById('page');
+      page.style.display = 'flex';
+      page.style.opacity = '0';
+      page.style.transition = 'opacity 1.2s ease';
+      setTimeout(() => { page.style.opacity = '1'; }, 100);
+
+      // Start music
+      if (ytPlayer && ytPlayer.playVideo) {
+        ytPlayer.setVolume(60);
+        ytPlayer.playVideo();
+      }
+
+      // Start reading after a short pause to let music begin
+      setTimeout(() => { startReading(); }, 2000);
+    }
+
     const letterParagraphs = [
       "Dear Sister.",
       "I am writing this to you today because I need you to know how deeply I see God's hand in our connection. I do not believe in coincidences, and I certainly do not believe that our paths crossed by accident. God put you in my life right when I needed you the most.",
