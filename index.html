@@ -371,14 +371,8 @@
       page.style.transition = 'opacity 1.2s ease';
       setTimeout(() => { page.style.opacity = '1'; }, 100);
 
-      // Start music
-      if (ytPlayer && ytPlayer.playVideo) {
-        ytPlayer.setVolume(60);
-        ytPlayer.playVideo();
-      }
-
-      // Start reading after a short pause to let music begin
-      setTimeout(() => { startReading(); }, 2000);
+      // Start reading immediately — music will play after reading finishes
+      setTimeout(() => { startReading(); }, 1500);
     }
 
     const letterParagraphs = [
@@ -400,27 +394,25 @@
 
     function getVoice() {
       const voices = window.speechSynthesis.getVoices();
-      // Priority order: most natural/neural voices first
+      // Southern US female voices — priority order
       const preferred = [
-        'Google US English',        // Chrome neural — very natural
-        'Microsoft Aria Online',    // Edge neural — warm female
-        'Microsoft Jenny Online',   // Edge neural — conversational
-        'Microsoft Zira',           // Windows female
-        'Samantha',                 // macOS/iOS — warm & natural
-        'Karen',                    // macOS Australian — clear female
-        'Moira',                    // macOS Irish — warm
-        'Tessa',                    // macOS South African — gentle
-        'Victoria',                 // macOS
-        'Google UK English Female', // Chrome UK female
+        'Microsoft Amber',          // US South / warm female (Edge)
+        'Microsoft Ana',            // US female, warm (Edge)
+        'Microsoft Michelle Online',// Edge neural US female — warm Southern tone
+        'Microsoft Jenny Online',   // Edge neural — conversational Southern-friendly
+        'Microsoft Aria Online',    // Edge neural warm female
+        'Google US English',        // Chrome neural US English
+        'Samantha',                 // macOS/iOS — warm natural
         'Susan',
-        'Zira'
+        'Zira',
+        'Victoria'
       ];
       for (const name of preferred) {
         const v = voices.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
         if (v) return v;
       }
-      // Fallback: any online/neural English voice
-      const online = voices.find(v => v.lang && v.lang.startsWith('en') && v.name.toLowerCase().includes('online'));
+      // Fallback: any online/neural US English female voice
+      const online = voices.find(v => v.lang && v.lang.startsWith('en-US') && v.name.toLowerCase().includes('online'));
       if (online) return online;
       return voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
              voices.find(v => v.lang && v.lang.startsWith('en')) ||
@@ -450,7 +442,16 @@
         document.getElementById('btn-read').disabled = false;
         document.getElementById('btn-pause').disabled = true;
         document.getElementById('btn-stop').disabled = true;
-        isReading = false; return;
+        isReading = false;
+        // Reading is done — now play the music
+        setTimeout(() => {
+          if (ytPlayer && ytPlayer.playVideo) {
+            ytPlayer.setVolume(70);
+            ytPlayer.playVideo();
+          }
+          setStatus('\u2665 You Know My Name — Tasha Cobbs');
+        }, 800);
+        return;
       }
       const u = new SpeechSynthesisUtterance(letterParagraphs[currentIndex]);
       u.rate = 0.82;   // Slightly slower — warm, unhurried, like a real person reading a letter
