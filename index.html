@@ -386,12 +386,31 @@
 
     function getVoice() {
       const voices = window.speechSynthesis.getVoices();
-      const preferred = ['Samantha','Karen','Victoria','Susan','Zira','Google US English'];
+      // Priority order: most natural/neural voices first
+      const preferred = [
+        'Google US English',        // Chrome neural — very natural
+        'Microsoft Aria Online',    // Edge neural — warm female
+        'Microsoft Jenny Online',   // Edge neural — conversational
+        'Microsoft Zira',           // Windows female
+        'Samantha',                 // macOS/iOS — warm & natural
+        'Karen',                    // macOS Australian — clear female
+        'Moira',                    // macOS Irish — warm
+        'Tessa',                    // macOS South African — gentle
+        'Victoria',                 // macOS
+        'Google UK English Female', // Chrome UK female
+        'Susan',
+        'Zira'
+      ];
       for (const name of preferred) {
-        const v = voices.find(v => v.name.includes(name));
+        const v = voices.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
         if (v) return v;
       }
-      return voices.find(v => v.lang && v.lang.startsWith('en')) || voices[0] || null;
+      // Fallback: any online/neural English voice
+      const online = voices.find(v => v.lang && v.lang.startsWith('en') && v.name.toLowerCase().includes('online'));
+      if (online) return online;
+      return voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
+             voices.find(v => v.lang && v.lang.startsWith('en')) ||
+             voices[0] || null;
     }
 
     function setStatus(t) { document.getElementById('voice-status').textContent = t; }
@@ -420,7 +439,9 @@
         isReading = false; return;
       }
       const u = new SpeechSynthesisUtterance(letterParagraphs[currentIndex]);
-      u.rate = 0.88; u.pitch = 1.05; u.volume = 1;
+      u.rate = 0.82;   // Slightly slower — warm, unhurried, like a real person reading a letter
+      u.pitch = 1.08;  // Slightly above neutral — feminine, warm, not robotic
+      u.volume = 1;
       const v = getVoice(); if (v) u.voice = v;
       u.onstart = () => setStatus('Reading…');
       u.onend = () => { currentIndex++; if (isReading && !isPaused) readNext(); };
